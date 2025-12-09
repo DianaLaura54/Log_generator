@@ -1,0 +1,360 @@
+{
+  "dashboard": {
+    "id": null,
+    "uid": "elk-stack-main",
+    "title": "ELK Stack - Main Dashboard",
+    "tags": ["elasticsearch", "logs", "monitoring"],
+    "timezone": "browser",
+    "schemaVersion": 39,
+    "version": 1,
+    "refresh": "10s",
+    "time": {
+      "from": "now-15m",
+      "to": "now"
+    },
+    "timepicker": {
+      "refresh_intervals": ["5s", "10s", "30s", "1m", "5m", "15m", "30m", "1h"]
+    },
+    "panels": [
+      {
+        "id": 1,
+        "gridPos": {"x": 0, "y": 0, "w": 6, "h": 4},
+        "type": "stat",
+        "title": "Total Logs",
+        "targets": [{
+          "refId": "A",
+          "datasource": {"type": "elasticsearch", "uid": "${DS_ELASTICSEARCH}"},
+          "query": "*",
+          "metrics": [{"type": "count", "id": "1"}],
+          "bucketAggs": [],
+          "timeField": "@timestamp"
+        }],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "thresholds"},
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": null, "color": "green"},
+                {"value": 1000, "color": "yellow"},
+                {"value": 10000, "color": "orange"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 2,
+        "gridPos": {"x": 6, "y": 0, "w": 6, "h": 4},
+        "type": "stat",
+        "title": "Errors (Last 15m)",
+        "targets": [{
+          "refId": "A",
+          "datasource": {"type": "elasticsearch", "uid": "${DS_ELASTICSEARCH}"},
+          "query": "level: ERROR",
+          "metrics": [{"type": "count", "id": "1"}],
+          "bucketAggs": [],
+          "timeField": "@timestamp"
+        }],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "thresholds"},
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": null, "color": "green"},
+                {"value": 5, "color": "yellow"},
+                {"value": 10, "color": "red"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 3,
+        "gridPos": {"x": 12, "y": 0, "w": 6, "h": 4},
+        "type": "stat",
+        "title": "Warnings",
+        "targets": [{
+          "refId": "A",
+          "datasource": {"type": "elasticsearch", "uid": "${DS_ELASTICSEARCH}"},
+          "query": "level: WARNING",
+          "metrics": [{"type": "count", "id": "1"}],
+          "bucketAggs": [],
+          "timeField": "@timestamp"
+        }],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "thresholds"},
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": null, "color": "blue"},
+                {"value": 10, "color": "yellow"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 4,
+        "gridPos": {"x": 18, "y": 0, "w": 6, "h": 4},
+        "type": "stat",
+        "title": "Avg Response Time",
+        "targets": [{
+          "refId": "A",
+          "datasource": {"type": "elasticsearch", "uid": "${DS_ELASTICSEARCH}"},
+          "query": "*",
+          "metrics": [{
+            "type": "avg",
+            "id": "1",
+            "field": "response_time_ms"
+          }],
+          "bucketAggs": [],
+          "timeField": "@timestamp"
+        }],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "thresholds"},
+            "unit": "ms",
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": null, "color": "green"},
+                {"value": 200, "color": "yellow"},
+                {"value": 500, "color": "red"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 5,
+        "gridPos": {"x": 0, "y": 4, "w": 12, "h": 8},
+        "type": "timeseries",
+        "title": "Log Count Over Time",
+        "targets": [{
+          "refId": "A",
+          "datasource": {"type": "elasticsearch", "uid": "${DS_ELASTICSEARCH}"},
+          "query": "*",
+          "metrics": [{"type": "count", "id": "1"}],
+          "bucketAggs": [{
+            "type": "date_histogram",
+            "id": "2",
+            "settings": {
+              "interval": "auto",
+              "min_doc_count": "0",
+              "trimEdges": "0"
+            }
+          }],
+          "timeField": "@timestamp"
+        }],
+        "fieldConfig": {
+          "defaults": {
+            "custom": {
+              "drawStyle": "line",
+              "lineInterpolation": "smooth",
+              "fillOpacity": 20,
+              "showPoints": "never"
+            },
+            "color": {"mode": "palette-classic"}
+          }
+        },
+        "options": {
+          "tooltip": {"mode": "multi"},
+          "legend": {"displayMode": "list", "placement": "bottom"}
+        }
+      },
+      {
+        "id": 6,
+        "gridPos": {"x": 12, "y": 4, "w": 12, "h": 8},
+        "type": "timeseries",
+        "title": "Logs by Level",
+        "targets": [{
+          "refId": "A",
+          "datasource": {"type": "elasticsearch", "uid": "${DS_ELASTICSEARCH}"},
+          "query": "*",
+          "metrics": [{"type": "count", "id": "1"}],
+          "bucketAggs": [
+            {
+              "type": "terms",
+              "id": "3",
+              "settings": {
+                "order": "desc",
+                "orderBy": "_count",
+                "size": "10"
+              },
+              "field": "level.keyword"
+            },
+            {
+              "type": "date_histogram",
+              "id": "2",
+              "settings": {"interval": "auto"}
+            }
+          ],
+          "timeField": "@timestamp"
+        }],
+        "fieldConfig": {
+          "defaults": {
+            "custom": {
+              "drawStyle": "line",
+              "lineInterpolation": "smooth",
+              "fillOpacity": 10,
+              "stacking": {"mode": "normal"}
+            },
+            "color": {"mode": "palette-classic"}
+          },
+          "overrides": [
+            {
+              "matcher": {"id": "byName", "options": "ERROR"},
+              "properties": [{"id": "color", "value": {"fixedColor": "red", "mode": "fixed"}}]
+            },
+            {
+              "matcher": {"id": "byName", "options": "WARNING"},
+              "properties": [{"id": "color", "value": {"fixedColor": "yellow", "mode": "fixed"}}]
+            },
+            {
+              "matcher": {"id": "byName", "options": "INFO"},
+              "properties": [{"id": "color", "value": {"fixedColor": "green", "mode": "fixed"}}]
+            }
+          ]
+        }
+      },
+      {
+        "id": 7,
+        "gridPos": {"x": 0, "y": 12, "w": 8, "h": 8},
+        "type": "piechart",
+        "title": "Distribution by Log Level",
+        "targets": [{
+          "refId": "A",
+          "datasource": {"type": "elasticsearch", "uid": "${DS_ELASTICSEARCH}"},
+          "query": "*",
+          "metrics": [{"type": "count", "id": "1"}],
+          "bucketAggs": [{
+            "type": "terms",
+            "id": "2",
+            "settings": {
+              "order": "desc",
+              "orderBy": "_count",
+              "size": "10"
+            },
+            "field": "level.keyword"
+          }],
+          "timeField": "@timestamp"
+        }],
+        "options": {
+          "legend": {"displayMode": "table", "placement": "right", "values": ["value", "percent"]},
+          "pieType": "pie",
+          "tooltip": {"mode": "multi"}
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "palette-classic"}
+          }
+        }
+      },
+      {
+        "id": 8,
+        "gridPos": {"x": 8, "y": 12, "w": 8, "h": 8},
+        "type": "bargauge",
+        "title": "Top Applications",
+        "targets": [{
+          "refId": "A",
+          "datasource": {"type": "elasticsearch", "uid": "${DS_ELASTICSEARCH}"},
+          "query": "*",
+          "metrics": [{"type": "count", "id": "1"}],
+          "bucketAggs": [{
+            "type": "terms",
+            "id": "2",
+            "settings": {
+              "order": "desc",
+              "orderBy": "_count",
+              "size": "10"
+            },
+            "field": "application.keyword"
+          }],
+          "timeField": "@timestamp"
+        }],
+        "options": {
+          "orientation": "horizontal",
+          "displayMode": "gradient",
+          "showUnfilled": true
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "continuous-GrYlRd"},
+            "mappings": []
+          }
+        }
+      },
+      {
+        "id": 9,
+        "gridPos": {"x": 16, "y": 12, "w": 8, "h": 8},
+        "type": "gauge",
+        "title": "Response Time P95",
+        "targets": [{
+          "refId": "A",
+          "datasource": {"type": "elasticsearch", "uid": "${DS_ELASTICSEARCH}"},
+          "query": "*",
+          "metrics": [{
+            "type": "percentiles",
+            "id": "1",
+            "field": "response_time_ms",
+            "settings": {"percents": ["95"]}
+          }],
+          "bucketAggs": [],
+          "timeField": "@timestamp"
+        }],
+        "options": {
+          "showThresholdLabels": false,
+          "showThresholdMarkers": true
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "ms",
+            "color": {"mode": "thresholds"},
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": null, "color": "green"},
+                {"value": 200, "color": "yellow"},
+                {"value": 400, "color": "red"}
+              ]
+            },
+            "min": 0,
+            "max": 500
+          }
+        }
+      },
+      {
+        "id": 10,
+        "gridPos": {"x": 0, "y": 20, "w": 24, "h": 10},
+        "type": "logs",
+        "title": "Recent Logs Stream",
+        "targets": [{
+          "refId": "A",
+          "datasource": {"type": "elasticsearch", "uid": "${DS_ELASTICSEARCH}"},
+          "query": "*",
+          "metrics": [{"type": "logs", "id": "1"}],
+          "bucketAggs": [],
+          "timeField": "@timestamp"
+        }],
+        "options": {
+          "showTime": true,
+          "showLabels": false,
+          "showCommonLabels": false,
+          "wrapLogMessage": true,
+          "prettifyLogMessage": false,
+          "enableLogDetails": true,
+          "dedupStrategy": "none",
+          "sortOrder": "Descending"
+        }
+      }
+    ]
+  },
+  "overwrite": true
+}
